@@ -98,7 +98,7 @@ exports.update = (req, res, next) => {
 
     const {quiz, tip} = req;
     tip.text = req.body.text;
-    tip.
+    tip.accepted =false;
 
     tip.save({fields: ["text", "accepted"]})
         .then(tip => {
