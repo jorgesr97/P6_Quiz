@@ -137,5 +137,15 @@ router.delete('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)',
     quizController.adminOrAuthorRequired,
     tipController.destroy);
 
+router.get('/quizzes/:quizId/tips/:tipId/edit',
+    sessionController.loginRequired,
+    quizController.adminOrAuthorRequired,
+	tipController.edit);
+
+router.put('/quizzes/:quizId/tips/:tipId',
+    sessionController.loginRequired,
+    quizController.adminOrAuthorRequired,
+    tipController.update);
+
 
 module.exports = router;

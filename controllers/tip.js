@@ -1,7 +1,6 @@
 const Sequelize = require("sequelize");
 const {models} = require("../models");
 
-
 // Autoload the tip with id equals to :tipId
 exports.load = (req, res, next, tipId) => {
 
@@ -17,6 +16,18 @@ exports.load = (req, res, next, tipId) => {
     .catch(error => next(error));
 };
 
+exports.adminOrAuthorRequired = (req, res, next) => {
+
+    const isAdmin = !!req.session.user.isAdmin;
+    const isAuthor = req.session.user.id === req.tip.authorId;
+
+    if(isAdmin || isAuthor){
+        next();
+    }
+    else {
+        res.send(403);
+    }
+};
 
 // POST /quizzes/:quizId/tips
 exports.create = (req, res, next) => {
@@ -74,5 +85,34 @@ exports.destroy = (req, res, next) => {
         res.redirect('/quizzes/' + req.params.quizId);
     })
     .catch(error => next(error));
+};
+
+exports.edit = (req,res,next) => {
+
+    const {quiz, tip} = req;
+
+    res.render('tips/edit', {quiz, tip});
+};
+
+exports.update = (req, res, next) => {
+
+    const {quiz, tip} = req;
+    tip.text = req.body.text;
+    tip.
+
+    tip.save({fields: ["text", "accepted"]})
+        .then(tip => {
+            req.flash('success', 'Tip edited successfully.');
+            res.redirect('/quizzes/' + quiz.id);
+        })
+        .catch(Sequelize.ValidationError, error => {
+            req.flash('error', 'There are errors in the form:');
+            error.errors.forEach(({message}) => req.flash('error', message));
+            res.render('tips/edit', {quiz, tip});
+        })
+        .catch(error => {
+            req.flash('error', 'Error editing the Quiz: ' + error.message);
+            next(error);
+        });
 };
 
